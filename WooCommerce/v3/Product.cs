@@ -450,9 +450,21 @@ namespace WooCommerceNET.WooCommerce.v3
         /// </summary>
         [DataMember(EmitDefaultValue = false)]
         public ProductError error { get; set; }
-    }
 
-    [DataContract]
+        /// <summary>
+        /// lang of product, Default it 
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public string lang { get; set; }
+
+        /// <summary>
+        /// lang of product, Default it 
+        /// </summary>
+        [DataMember(EmitDefaultValue = false)]
+        public Translations tranlsations { get; set; }
+   }
+
+   [DataContract]
     public class ProductDownloadLine : v2.ProductDownloadLine { }
 
     [DataContract]
@@ -601,4 +613,20 @@ namespace WooCommerceNET.WooCommerce.v3
 
     [DataContract]
     public class ProductError : v2.ProductError { }
+
+   [DataContract]
+   public class Translations
+   {
+      /// <summary>
+      /// Ref ID of lang it
+      /// </summary>
+      [DataMember(EmitDefaultValue = false)]
+      public long? it { get; set; }
+
+      /// <summary>
+      /// Ref ID of lang en
+      /// </summary>
+      [DataMember(EmitDefaultValue = false)]
+      public long? en { get; set; }
+   }
 }
