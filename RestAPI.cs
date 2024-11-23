@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WooCommerceNET.Base;
 
@@ -247,21 +251,23 @@ namespace WooCommerceNET
                     {
                         if (requestBody.ToString() == "fileupload")
                         {
-                            httpWebRequest.Headers["Content-Disposition"] = $"form-data; filename=\"{parms["name"]}\"";
-                            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                           var filePath = parms["path"] + "\\" + parms["name"];
+                           var url = new Uri(wc_url + endpoint);
 
-                            using (Stream dataStream = await httpWebRequest.GetRequestStreamAsync().ConfigureAwait(false))
-                            {
-                                FileStream fileStream = new FileStream(parms["path"], FileMode.Open, FileAccess.Read);
-                                byte[] buffer = new byte[4096];
-                                int bytesRead = 0;
+                           using (var client = new HttpClient())
+                           using (var content = new MultipartFormDataContent())
+                           using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                           using (var fileContent = new StreamContent(fileStream))
+                           {
+                              var authenticationString = $"{oauth_token}:{oauth_token_secret}";
+                              var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+                              client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                              fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data");
+                              content.Add(fileContent, "file", Path.GetFileName(filePath));
 
-                                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
-                                {
-                                    dataStream.Write(buffer, 0, bytesRead);
-                                }
-                                fileStream.Close();
-                            }
+                              var response = await client.PostAsync(url, content);
+                              return await response.Content.ReadAsStringAsync();
+                           }
                         }
                         else
                         {

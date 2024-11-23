@@ -252,7 +252,22 @@ namespace WooCommerceNET.WooCommerce.Legacy
             return await API.SendHttpClientRequest("products/" + productid.ToString(), RequestMethod.DELETE, string.Empty, parms).ConfigureAwait(false);
         }
 
-        public async Task<ProductReviewList> GetProductReviews(int productid, Dictionary<string,string> parms = null)
+         public async Task<string> PostProductVariation(int productid, Variation v, Dictionary<string, string> parms = null)
+         {
+            return await API.SendHttpClientRequest("products/" + productid.ToString() + "/variations", RequestMethod.POST, v, parms).ConfigureAwait(false);
+         }
+
+         public async Task<string> UpdateProductVariation(int productid, int variationid, Variation v, Dictionary<string, string> parms = null)
+         {
+            return await API.SendHttpClientRequest("products/" + productid.ToString() + "/variations/" + variationid.ToString(), RequestMethod.PUT, v, parms).ConfigureAwait(false);
+         }
+
+         public async Task<string> DeleteProductVarion(int productid, int variationid, Dictionary<string, string> parms = null)
+         {
+            return await API.SendHttpClientRequest("products/" + productid.ToString() + "/variations/" + variationid.ToString(), RequestMethod.DELETE, string.Empty, parms).ConfigureAwait(false);
+         }
+
+      public async Task<ProductReviewList> GetProductReviews(int productid, Dictionary<string,string> parms = null)
         {
             string json = await API.SendHttpClientRequest("products/" + productid.ToString() + "/reviews", RequestMethod.GET, string.Empty, parms).ConfigureAwait(false);
             json = json.Substring(json.IndexOf(':') + 1, json.Length - json.IndexOf(':') - 2);
